@@ -1,0 +1,100 @@
+.chips-input {
+  // Colors
+  --input-color-bg: var(--color-white);
+  --input-color-text: var(--color-gray-900);
+  --input-color-label: var(--color-gray-500);
+  --input-color-border: var(--color-gray-200);
+  --input-color-focus: var(--color-blue-400);
+  --input-shadow-focus: var(--shadow-focus);
+
+  // Dimensions
+  --input-radius: var(--border-radius-m);
+
+  &._error {
+    --input-color-label: var(--color-red-700);
+    --input-color-border: var(--color-red-700);
+  }
+
+  &._readonly {
+    --input-color-bg: var(--color-gray-100);
+    --input-color-border: var(--color-gray-100);
+  }
+
+  &__container {
+    position: relative;
+    padding: 2.5px 9.5px;
+    min-height: 46px;
+    border: 1px solid var(--input-color-border);
+    transition-property: border-color, box-shadow;
+    transition-duration: 0.3s;
+    border-radius: var(--input-radius);
+    background-color: var(--input-color-bg);
+
+    &:focus-within {
+      border-color: var(--input-color-focus);
+      box-shadow: var(--input-shadow-focus);
+    }
+
+    &:hover {
+      border-color: var(--input-color-focus);
+    }
+  }
+
+  &__container:focus-within &__label {
+    transform: scale(0.75) translateY(-11.5px);
+  }
+
+  &__label {
+    @include font(14px, 21px);
+
+    position: absolute;
+    left: 9.5px;
+    top: 11.5px;
+    color: var(--input-color-label);
+    transition: transform 0.3s;
+    transform-origin: top left;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  &__body {
+    padding: 16px 0 0;
+  }
+
+  &__chips {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 3.5px 7px;
+    width: 100%;
+  }
+
+  &__input {
+    @include font(14px, 21px);
+
+    position: relative;
+    flex: 1 0 70px;
+    height: var(--input-height);
+    overflow: hidden;
+    border: none;
+    color: var(--input-color-text);
+    background-color: transparent;
+    box-shadow: none;
+    z-index: 1;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__info {
+    @include font(10.5px, 16px);
+
+    display: block;
+    color: var(--input-color-label);
+    position: absolute;
+  }
+}

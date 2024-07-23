@@ -1,0 +1,10 @@
+// global styles
+@import './global/_fonts';
+@import './global/_reset';
+@import './global/_variables';
+
+// mixins
+@import 'mixins/_font';
+
+// components styles
+@import './components/components';

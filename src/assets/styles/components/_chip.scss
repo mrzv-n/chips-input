@@ -1,0 +1,53 @@
+.chip {
+  --chip-color: var(--color-gray-900);
+  --chip-bg: var(--color-gray-100);
+  --chip-radius: var(--border-radius-s);
+
+  @include font(10.5px, 16px);
+
+  display: flex;
+  align-items: center;
+  gap: 3.5px;
+  padding: 3.5px 7px;
+  border-radius: var(--chip-radius);
+  background-color: var(--chip-bg);
+  color: var(--chip-color);
+  overflow: hidden;
+
+  &._error {
+    --chip-color: var(--color-white);
+    --chip-bg: var(--color-red-700);
+  }
+
+  &._readonly {
+    --chip-bg: var(--color-gray-300);
+    padding: 3.5px 14px;
+  }
+
+  &__label {
+    flex: 1;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__remove-btn {
+    color: var(--chip-color);
+    transition: opacity 0.3s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &:focus {
+      box-shadow: var(--shadow-focus);
+    }
+  }
+
+  &__remove-icon {
+    display: block;
+    width: 14px;
+    height: 14px;
+  }
+}

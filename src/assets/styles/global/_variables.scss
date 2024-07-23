@@ -1,0 +1,21 @@
+:root {
+  --basic-font-family: 'Roboto', 'Arial', sans-serif;
+
+  // Colors
+  --color-white: #fff;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-500: #6b7280;
+  --color-gray-900: #111827;
+  --color-red-700: #b91c1c;
+  --color-blue-200: #dbeafe;
+  --color-blue-400: #60a5fa;
+
+  // shadows
+  --shadow-focus: 0 0 0 2.8px var(--color-blue-200);
+
+  // Dimensions
+  --border-radius-s: 3.5px;
+  --border-radius-m: 7px;
+}
