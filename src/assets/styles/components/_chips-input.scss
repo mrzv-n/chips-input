@@ -18,6 +18,8 @@
   &._disabled {
     --input-color-bg: var(--color-gray-100);
     --input-color-border: var(--color-gray-100);
+
+    pointer-events: none;
   }
 
   &:focus-within &__label,

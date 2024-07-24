@@ -1,87 +1,128 @@
 <template>
-  <div class="chips-input _readonly">
+  <div
+    :class="['chips-input', rootClassNames]"
+    @click="focusInput"
+  >
     <div class="chips-input__container">
       <div class="chips-input__body">
         <div class="chips-input__chips">
-          <div class="chip _readonly">
-            <div class="chip__label">first</div>
-            <button class="chip__remove-btn" style="display: none">
-              <svg
-                class="chip__remove-icon"
-                width="12"
-                height="12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="m6.795 6.007 3.346-3.345a.567.567 0 1 0-.803-.803L5.993 5.205 2.647 1.859a.568.568 0 0 0-.802.803L5.19 6.007 1.845 9.353a.568.568 0 0 0 .802.802L5.993 6.81l3.345 3.345a.568.568 0 0 0 .803-.802L6.795 6.007Z"
-                  fill="currentColor"
-                />
-              </svg>
+          <div
+            v-for="(item, index) in model"
+            :key="item + index"
+            :class="['chip', chipClassNames]"
+          >
+            <div class="chip__label">{{ item }}</div>
+            <button
+              v-if="!disabled"
+              class="chip__remove-btn"
+            >
+              <CrossIcon class="chip__remove-icon" />
             </button>
           </div>
-          <div class="chip _error">
-            <div class="chip__label">second</div>
-            <button class="chip__remove-btn">
-              <svg
-                class="chip__remove-icon"
-                width="12"
-                height="12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="m6.795 6.007 3.346-3.345a.567.567 0 1 0-.803-.803L5.993 5.205 2.647 1.859a.568.568 0 0 0-.802.803L5.19 6.007 1.845 9.353a.568.568 0 0 0 .802.802L5.993 6.81l3.345 3.345a.568.568 0 0 0 .803-.802L6.795 6.007Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </button>
-          </div>
-          <div class="chip">
-            <div class="chip__label">third</div>
-            <button class="chip__remove-btn">
-              <svg
-                class="chip__remove-icon"
-                width="12"
-                height="12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="m6.795 6.007 3.346-3.345a.567.567 0 1 0-.803-.803L5.993 5.205 2.647 1.859a.568.568 0 0 0-.802.803L5.19 6.007 1.845 9.353a.568.568 0 0 0 .802.802L5.993 6.81l3.345 3.345a.568.568 0 0 0 .803-.802L6.795 6.007Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </button>
-          </div>
-          <div class="chip">
-            <div class="chip__label">
-              longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong
-            </div>
-            <button class="chip__remove-btn">
-              <svg
-                class="chip__remove-icon"
-                width="12"
-                height="12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="m6.795 6.007 3.346-3.345a.567.567 0 1 0-.803-.803L5.993 5.205 2.647 1.859a.568.568 0 0 0-.802.803L5.19 6.007 1.845 9.353a.568.568 0 0 0 .802.802L5.993 6.81l3.345 3.345a.568.568 0 0 0 .803-.802L6.795 6.007Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </button>
-          </div>
-          <input class="chips-input__input" type="text" />
+          <input
+            ref="inputField"
+            :disabled="disabled"
+            class="chips-input__input"
+            type="text"
+            v-model="inputValue"
+            @keydown="handleKeyDown"
+            @blur="handleBlur"
+          />
         </div>
       </div>
-      <label class="chips-input__label">Label</label>
+      <label class="chips-input__label">{{ label }}</label>
     </div>
-    <div class="chips-input__info">Info Message</div>
+    <p class="chips-input__info">{{ message }}</p>
   </div>
 </template>
 
-<script lang="ts" setup></script>
+<script setup lang="ts">
+import { defineProps, ref, computed } from 'vue'
+import CrossIcon from '@/assets/img/icons/cross.svg'
 
-<style scoped lang="scss"></style>
+export interface ChipsInputProps {
+  model: string[]
+  label?: string
+  placeholder?: string
+  max?: number
+  addOnBlur?: boolean
+  allowDuplicate?: boolean
+  disabled?: boolean
+  validator?: () => boolean
+  message?: string
+  separators?: string[]
+}
+
+const props = withDefaults(defineProps<ChipsInputProps>(), {
+  label: '',
+  placeholder: '',
+  max: Infinity,
+  addOnBlur: true,
+  allowDuplicate: true,
+  disabled: true,
+  validator: () => true,
+  hint: '',
+  separators: () => [',', ' ', '\n']
+})
+
+const emit = defineEmits(['update:model', 'add', 'remove', 'focus', 'blur'])
+
+const chips = ref([...props.model])
+const error = ref(false)
+const inputField = ref<HTMLInputElement>()
+const inputValue = ref('')
+const rootClassNames = computed(() => ({
+  _error: error.value,
+  _disabled: props.disabled,
+  _active: props.model.length || inputValue.value
+}))
+const chipClassNames = computed(() => ({
+  _error: error.value,
+  _disabled: props.disabled
+}))
+
+function focusInput(): void {
+  inputField.value!.focus()
+}
+
+function handleKeyDown(e: KeyboardEvent): void {
+  if ((isKeySeparator(e.key) || e.key === 'Enter') && inputValue.value.trim().length) {
+    e.preventDefault()
+
+    if (isInputCaretOnEnd()) {
+      addChip(inputValue.value)
+      clearInputValue()
+    }
+  }
+}
+
+function handleBlur(): void {
+  if (props.addOnBlur && inputValue.value) {
+    addChip(inputValue.value)
+    clearInputValue()
+  }
+}
+
+function clearInputValue(): void {
+  inputValue.value = ''
+}
+
+function isInputCaretOnStart(): boolean {
+  return inputField.value!.selectionStart === 0
+}
+
+function isInputCaretOnEnd(): boolean {
+  return inputField.value!.selectionStart === inputValue.value!.length
+}
+
+function addChip(chipValue: string): void {
+  if (!props.allowDuplicate && chips.value.includes(chipValue)) return
+
+  chips.value.push(chipValue)
+  emit('update:model', chips.value)
+}
+
+function isKeySeparator(key: string): boolean {
+  return props.separators.includes(key)
+}
+</script>
