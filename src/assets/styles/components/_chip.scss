@@ -19,7 +19,7 @@
     --chip-bg: var(--color-red-700);
   }
 
-  &._readonly {
+  &._disabled {
     --chip-bg: var(--color-gray-300);
     padding: 3.5px 14px;
   }

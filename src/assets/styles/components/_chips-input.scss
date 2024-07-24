@@ -15,9 +15,14 @@
     --input-color-border: var(--color-red-700);
   }
 
-  &._readonly {
+  &._disabled {
     --input-color-bg: var(--color-gray-100);
     --input-color-border: var(--color-gray-100);
+  }
+
+  &:focus-within &__label,
+  &._active &__label {
+    transform: scale(0.75) translateY(-11.5px);
   }
 
   &__container {
@@ -38,10 +43,6 @@
     &:hover {
       border-color: var(--input-color-focus);
     }
-  }
-
-  &__container:focus-within &__label {
-    transform: scale(0.75) translateY(-11.5px);
   }
 
   &__label {
@@ -76,7 +77,7 @@
     @include font(14px, 21px);
 
     position: relative;
-    flex: 1 0 70px;
+    flex: 1 0 5px;
     height: var(--input-height);
     overflow: hidden;
     border: none;
@@ -87,6 +88,7 @@
 
     &:focus {
       outline: none;
+      flex-basis: 100px;
     }
   }
 

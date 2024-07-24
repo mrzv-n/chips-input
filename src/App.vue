@@ -1,7 +1,7 @@
 <template>
-  <ChipsInput />
+  <ChipsInputDemo/>
 </template>
 
-<script setup>
-import ChipsInput from '@/components/UI/ChipsInput/ChipsInput.vue'
+<script setup lang="ts">
+import ChipsInputDemo from "@/pages/ChipsInputDemo.vue";
 </script>
