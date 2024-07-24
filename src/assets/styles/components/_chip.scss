@@ -24,6 +24,11 @@
     padding: 3.5px 14px;
   }
 
+  &:hover,
+  &:focus {
+    --chip-bg: var(--color-gray-200);
+  }
+
   &__label {
     flex: 1;
     max-width: 100%;
