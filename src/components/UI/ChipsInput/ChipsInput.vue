@@ -92,14 +92,18 @@ const emit = defineEmits(['update:model', 'add', 'remove', 'focus', 'blur'])
 const chips = ref([...props.model])
 const inputValue = ref('')
 
+const isAllChipsValid = computed(() => {
+  return chips.value.every(isValidChip)
+})
+
 const rootClassNames = computed(() => ({
-  _error: isAllChipsValid,
+  _error: !isAllChipsValid.value,
   _disabled: props.disabled,
   _active: props.model.length || inputValue.value
 }))
 
 const chipClassNames = computed(() => ({
-  _error: isAllChipsValid,
+  _error: !isAllChipsValid.value,
   _disabled: props.disabled
 }))
 
@@ -108,10 +112,6 @@ let chipRefs: HTMLElement[] = []
 
 const fieldId = `input-${Date.now()}`
 const hintId = `hint-${Date.now()}`
-
-const isAllChipsValid = computed(() => {
-  return chips.value.every(isValidChip)
-})
 
 function addChipRef(chipRef: Element | ComponentPublicInstance | null, index: number) {
   if (chipRef) {
