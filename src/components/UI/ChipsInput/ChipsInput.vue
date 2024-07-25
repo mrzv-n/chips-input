@@ -38,6 +38,7 @@
             @keydown="handleKeyDown"
             @blur="handleBlur"
             @focus="handleFocus"
+            @paste="handlePaste"
           />
         </div>
       </div>
@@ -58,12 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  defineProps,
-  ref,
-  computed,
-  type ComponentPublicInstance
-} from 'vue'
+import { defineProps, ref, computed, type ComponentPublicInstance } from 'vue'
 import CrossIcon from '@/assets/img/icons/cross.svg'
 
 export interface ChipsInputProps {
@@ -74,7 +70,7 @@ export interface ChipsInputProps {
   addOnBlur?: boolean
   allowDuplicate?: boolean
   disabled?: boolean
-  validator?: () => boolean
+  validator?: (value: string) => boolean
   hint?: string
   separators?: string[]
 }
@@ -94,17 +90,16 @@ const props = withDefaults(defineProps<ChipsInputProps>(), {
 const emit = defineEmits(['update:model', 'add', 'remove', 'focus', 'blur'])
 
 const chips = ref([...props.model])
-const error = ref(false)
 const inputValue = ref('')
 
 const rootClassNames = computed(() => ({
-  _error: error.value,
+  _error: isAllChipsValid,
   _disabled: props.disabled,
   _active: props.model.length || inputValue.value
 }))
 
 const chipClassNames = computed(() => ({
-  _error: error.value,
+  _error: isAllChipsValid,
   _disabled: props.disabled
 }))
 
@@ -114,6 +109,10 @@ let chipRefs: HTMLElement[] = []
 const fieldId = `input-${Date.now()}`
 const hintId = `hint-${Date.now()}`
 
+const isAllChipsValid = computed(() => {
+  return chips.value.every(isValidChip)
+})
+
 function addChipRef(chipRef: Element | ComponentPublicInstance | null, index: number) {
   if (chipRef) {
     chipRefs[index] = chipRef as HTMLElement
@@ -122,6 +121,23 @@ function addChipRef(chipRef: Element | ComponentPublicInstance | null, index: nu
 
 function focusInput(): void {
   inputField.value?.focus()
+}
+
+function handlePaste(event: ClipboardEvent): void {
+  if (props.disabled) return
+
+  const pasteData = event.clipboardData?.getData('text')
+
+  if (pasteData) {
+    const pastedChips = pasteData
+      .split(new RegExp(`[${props.separators.join('')}]`))
+      .map((chip) => chip.trim())
+      .filter((chip) => chip.length)
+
+    pastedChips.forEach((chip) => addChip(chip))
+    clearInputValue()
+    event.preventDefault()
+  }
 }
 
 function handleKeyDown(e: KeyboardEvent): void {
@@ -134,7 +150,11 @@ function handleKeyDown(e: KeyboardEvent): void {
     }
   }
 
-  if (isInputCaretOnStart() && e.key === 'ArrowLeft' && chips.value.length) {
+  if (
+    isInputCaretOnStart() &&
+    (e.key === 'ArrowLeft' || e.key === 'Backspace') &&
+    chips.value.length
+  ) {
     const lastChipIndex = chips.value.length - 1
 
     chipRefs[lastChipIndex].focus()
@@ -175,6 +195,7 @@ function handleBlur(): void {
 
 function addChip(chipLabel: string): void {
   if (!props.allowDuplicate && chips.value.includes(chipLabel)) return
+  if (chips.value.length === props.max) return
 
   chips.value.push(chipLabel)
   emit('add', chipLabel)
@@ -208,6 +229,10 @@ function isInputCaretOnEnd(): boolean {
 
 function isKeySeparator(key: string): boolean {
   return props.separators.includes(key)
+}
+
+function isValidChip(chipValue: string) {
+  return props.validator(chipValue)
 }
 
 function resizeInput(): void {

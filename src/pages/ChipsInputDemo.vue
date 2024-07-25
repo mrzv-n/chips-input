@@ -6,7 +6,6 @@
         :model="mails"
         label="Label"
         hint="Small hint"
-        test="test"
         @update:model="updateMails"
       />
     </div>
