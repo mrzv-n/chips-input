@@ -39,7 +39,12 @@
       </div>
       <label class="chips-input__label">{{ label }}</label>
     </div>
-    <p class="chips-input__info">{{ message }}</p>
+    <p
+      v-if="hint"
+      class="chips-input__info"
+    >
+      {{ hint }}
+    </p>
   </div>
 </template>
 
@@ -56,7 +61,7 @@ export interface ChipsInputProps {
   allowDuplicate?: boolean
   disabled?: boolean
   validator?: () => boolean
-  message?: string
+  hint?: string
   separators?: string[]
 }
 

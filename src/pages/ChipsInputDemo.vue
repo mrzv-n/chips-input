@@ -4,8 +4,8 @@
       <ChipsInput
         class="page__form-field"
         :model="mails"
-        label="aaaa"
-        message="bbb"
+        label="Label"
+        hint="Small hint"
         test="test"
         @update:model="updateMails"
       />
