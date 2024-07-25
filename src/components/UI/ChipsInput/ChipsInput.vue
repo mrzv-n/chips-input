@@ -13,6 +13,7 @@
             :class="['chip', chipClassNames]"
             role="option"
             tabindex="0"
+            @click.stop="(e) => handleChipClick(e, index)"
             @keydown="(e) => handleChipKeyDown(e, index)"
           >
             <div class="chip__label">{{ chipLabel }}</div>
@@ -26,21 +27,29 @@
             </button>
           </div>
           <input
+            v-model="inputValue"
+            :id="fieldId"
             ref="inputField"
             :disabled="disabled"
             class="chips-input__input"
             type="text"
-            v-model="inputValue"
+            :aria-describedby="hintId"
+            @input="resizeInput"
             @keydown="handleKeyDown"
             @blur="handleBlur"
             @focus="handleFocus"
           />
         </div>
       </div>
-      <label class="chips-input__label">{{ label }}</label>
+      <label
+        :for="fieldId"
+        class="chips-input__label"
+        >{{ label }}</label
+      >
     </div>
     <p
       v-if="hint"
+      :id="hintId"
       class="chips-input__info"
     >
       {{ hint }}
@@ -49,7 +58,12 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, computed, type ComponentPublicInstance } from 'vue'
+import {
+  defineProps,
+  ref,
+  computed,
+  type ComponentPublicInstance
+} from 'vue'
 import CrossIcon from '@/assets/img/icons/cross.svg'
 
 export interface ChipsInputProps {
@@ -81,18 +95,24 @@ const emit = defineEmits(['update:model', 'add', 'remove', 'focus', 'blur'])
 
 const chips = ref([...props.model])
 const error = ref(false)
-const inputField = ref<HTMLInputElement | null>(null)
 const inputValue = ref('')
-let chipRefs: HTMLElement[] = []
+
 const rootClassNames = computed(() => ({
   _error: error.value,
   _disabled: props.disabled,
   _active: props.model.length || inputValue.value
 }))
+
 const chipClassNames = computed(() => ({
   _error: error.value,
   _disabled: props.disabled
 }))
+
+const inputField = ref<HTMLInputElement | null>(null)
+let chipRefs: HTMLElement[] = []
+
+const fieldId = `input-${Date.now()}`
+const hintId = `hint-${Date.now()}`
 
 function addChipRef(chipRef: Element | ComponentPublicInstance | null, index: number) {
   if (chipRef) {
@@ -121,7 +141,7 @@ function handleKeyDown(e: KeyboardEvent): void {
   }
 }
 
-function handleChipKeyDown(e: KeyboardEvent, index: number) {
+function handleChipKeyDown(e: KeyboardEvent, index: number): void {
   let currentIndex = index
 
   if (e.key === 'ArrowLeft' && currentIndex > 0) {
@@ -134,6 +154,10 @@ function handleChipKeyDown(e: KeyboardEvent, index: number) {
   if (e.key === 'Backspace') {
     removeChip(currentIndex, chips.value[currentIndex])
   }
+}
+
+function handleChipClick(e: Event, index: number): void {
+  chipRefs[index].focus()
 }
 
 function handleFocus(): void {
@@ -157,7 +181,7 @@ function addChip(chipLabel: string): void {
   emit('update:model', chips.value)
 }
 
-function removeChip(index: number, chipLabel: string) {
+function removeChip(index: number, chipLabel: string): void {
   // Реализовано через slice и в emit('remove') передается объект, так как возможны одноименные чипсы
   chips.value = [...chips.value.slice(0, index), ...chips.value.slice(index + 1)]
 
@@ -166,6 +190,7 @@ function removeChip(index: number, chipLabel: string) {
     chipLabel
   })
   emit('update:model', chips.value)
+
   focusInput()
 }
 
@@ -183,5 +208,11 @@ function isInputCaretOnEnd(): boolean {
 
 function isKeySeparator(key: string): boolean {
   return props.separators.includes(key)
+}
+
+function resizeInput(): void {
+  if (inputField.value) {
+    inputField.value.style.width = inputValue.value.length + 'ch'
+  }
 }
 </script>
