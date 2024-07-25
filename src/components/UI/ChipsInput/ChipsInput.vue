@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, computed } from 'vue'
+import { defineProps, ref, computed, type ComponentPublicInstance } from 'vue'
 import CrossIcon from '@/assets/img/icons/cross.svg'
 
 export interface ChipsInputProps {
@@ -76,7 +76,7 @@ const emit = defineEmits(['update:model', 'add', 'remove', 'focus', 'blur'])
 
 const chips = ref([...props.model])
 const error = ref(false)
-const inputField = ref<HTMLInputElement>()
+const inputField = ref<HTMLInputElement | null>(null)
 const inputValue = ref('')
 let chipRefs: HTMLElement[] = []
 const rootClassNames = computed(() => ({
@@ -89,12 +89,14 @@ const chipClassNames = computed(() => ({
   _disabled: props.disabled
 }))
 
-function addChipRef(chipRef: HTMLElement, index: number) {
-  chipRefs[index] = chipRef
+function addChipRef(chipRef: Element | ComponentPublicInstance | null, index: number) {
+  if (chipRef) {
+    chipRefs[index] = chipRef as HTMLElement
+  }
 }
 
 function focusInput(): void {
-  inputField.value!.focus()
+  inputField.value?.focus()
 }
 
 function handleKeyDown(e: KeyboardEvent): void {
@@ -142,18 +144,6 @@ function handleBlur(): void {
   emit('blur')
 }
 
-function clearInputValue(): void {
-  inputValue.value = ''
-}
-
-function isInputCaretOnStart(): boolean {
-  return inputField.value!.selectionStart === 0
-}
-
-function isInputCaretOnEnd(): boolean {
-  return inputField.value!.selectionStart === inputValue.value!.length
-}
-
 function addChip(chipLabel: string): void {
   if (!props.allowDuplicate && chips.value.includes(chipLabel)) return
 
@@ -172,6 +162,18 @@ function removeChip(index: number, chipLabel: string) {
   })
   emit('update:model', chips.value)
   focusInput()
+}
+
+function clearInputValue(): void {
+  inputValue.value = ''
+}
+
+function isInputCaretOnStart(): boolean {
+  return inputField.value ? inputField.value.selectionStart === 0 : false
+}
+
+function isInputCaretOnEnd(): boolean {
+  return inputField.value ? inputField.value.selectionStart === inputValue.value.length : false
 }
 
 function isKeySeparator(key: string): boolean {
