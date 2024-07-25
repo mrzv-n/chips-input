@@ -27,6 +27,10 @@
   &:hover,
   &:focus {
     --chip-bg: var(--color-gray-200);
+
+    &._error {
+      --chip-bg: var(--color-red-900);
+    }
   }
 
   &__label {

@@ -99,12 +99,14 @@
   &__info {
     @include font(10.5px, 16px);
 
-    position: absolute;
     display: block;
     width: 100%;
     color: var(--input-color-label);
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 }
