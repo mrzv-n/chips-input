@@ -10,6 +10,8 @@
   // Dimensions
   --input-radius: var(--border-radius-m);
 
+  position: relative;
+
   &._error {
     --input-color-label: var(--color-red-700);
     --input-color-border: var(--color-red-700);
@@ -53,6 +55,7 @@
     position: absolute;
     left: 9.5px;
     top: 11.5px;
+    width: 100%;
     color: var(--input-color-label);
     transition: transform 0.3s;
     transform-origin: top left;
@@ -97,8 +100,12 @@
   &__info {
     @include font(10.5px, 16px);
 
-    display: block;
-    color: var(--input-color-label);
     position: absolute;
+    display: block;
+    width: 100%;
+    color: var(--input-color-label);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
