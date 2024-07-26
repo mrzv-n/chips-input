@@ -62,32 +62,81 @@
 import { defineProps, ref, computed, type ComponentPublicInstance } from 'vue'
 import CrossIcon from '@/assets/img/icons/cross.svg'
 
-export interface ChipsInputProps {
-  model: string[]
-  label?: string
-  placeholder?: string
-  max?: number
-  addOnBlur?: boolean
-  allowDuplicate?: boolean
-  disabled?: boolean
-  validator?: (value: string) => boolean
-  hint?: string
-  separators?: string[]
-}
+const props = withDefaults(
+  defineProps<{
+    /**
+     * Список токенов
+     */
+    model: string[]
+    /**
+     * Заголовок поля
+     */
+    label?: string
+    /**
+     * Максимальное количество токенов, которые могут быть добавлены в поле
+     */
+    max?: number
+    /**
+     * Параметр разрешающий / запрещающий добавление токена при потере фокуса на поле
+     */
+    addOnBlur?: boolean
+    /**
+     * Параметр разрешающий / запрещающий повторяющиеся значения токенов
+     */
+    allowDuplicate?: boolean
+    /**
+     * Определяет состояние блокировки поля
+     */
+    disabled?: boolean
+    /**
+     * Функция для валидации значений токенов. Вызывается для каждого токена. Должна
+     * возвращать true - для валидного, false - для невалидного значения
+     */
+    validator?: (value: string) => boolean
+    /**
+     * Подсказка под элементом ввода
+     */
+    hint?: string
+    /**
+     * Массив допустимых разделителей для разбиения строки на токены
+     */
+    separators?: string[]
+  }>(),
+  {
+    label: '',
+    placeholder: '',
+    max: Infinity,
+    addOnBlur: true,
+    allowDuplicate: true,
+    disabled: false,
+    validator: () => true,
+    hint: '',
+    separators: () => [',', ' ', '\n']
+  }
+)
 
-const props = withDefaults(defineProps<ChipsInputProps>(), {
-  label: '',
-  placeholder: '',
-  max: Infinity,
-  addOnBlur: true,
-  allowDuplicate: true,
-  disabled: false,
-  validator: () => true,
-  hint: '',
-  separators: () => [',', ' ', '\n']
-})
-
-const emit = defineEmits(['update:model', 'add', 'remove', 'focus', 'blur'])
+const emit = defineEmits<{
+  /**
+   * Событие происходит при изменениях в наборе токенов
+   */
+  'update:model': [model: string[]]
+  /**
+   * Событие происходит при добавлении токена
+   */
+  add: [value: string]
+  /**
+   * Событие происходит при удалении токена
+   */
+  remove: [value: string]
+  /**
+   * Событие происходит при фокусе на input
+   */
+  focus: [e: FocusEvent]
+  /**
+   * Событие происходит при потере фокуса с input
+   */
+  blur: [e: FocusEvent]
+}>()
 
 const chips = ref([...props.model])
 const inputValue = ref('')
@@ -180,17 +229,17 @@ function handleChipClick(e: Event, index: number): void {
   chipRefs[index].focus()
 }
 
-function handleFocus(): void {
-  emit('focus')
+function handleFocus(e: FocusEvent): void {
+  emit('focus', e)
 }
 
-function handleBlur(): void {
+function handleBlur(e: FocusEvent): void {
   if (props.addOnBlur && inputValue.value) {
     addChip(inputValue.value)
     clearInputValue()
   }
 
-  emit('blur')
+  emit('blur', e)
 }
 
 function addChip(chipLabel: string): void {
@@ -206,10 +255,7 @@ function removeChip(index: number, chipLabel: string): void {
   // Реализовано через slice и в emit('remove') передается объект, так как возможны одноименные чипсы
   chips.value = [...chips.value.slice(0, index), ...chips.value.slice(index + 1)]
 
-  emit('remove', {
-    index,
-    chipLabel
-  })
+  emit('remove', chipLabel)
   emit('update:model', chips.value)
 
   focusInput()

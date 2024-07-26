@@ -82,7 +82,7 @@
     @include font(14px, 21px);
 
     position: relative;
-    width: 8px;
+    width: 1ch;
     height: var(--input-height);
     overflow: hidden;
     border: none;
