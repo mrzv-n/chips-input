@@ -104,7 +104,6 @@ const props = withDefaults(
   }>(),
   {
     label: '',
-    placeholder: '',
     max: Infinity,
     addOnBlur: true,
     allowDuplicate: true,

@@ -9,15 +9,15 @@ const meta: Meta<typeof ChipsInput> = {
   component: ChipsInput,
   tags: ['autodocs'],
   argTypes: {
-    model: { control: 'array' },
+    model: { control: 'object' },
     label: { control: 'text' },
     max: { control: 'number' },
     addOnBlur: { control: 'boolean' },
     allowDuplicate: { control: 'boolean' },
     disabled: { control: 'boolean' },
     hint: { control: 'text' },
-    separators: { control: 'array' },
-    validator: { control: 'function' }
+    separators: { control: 'object' },
+    validator: { control: undefined }
   }
 }
 
